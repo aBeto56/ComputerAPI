@@ -1,6 +1,7 @@
 ﻿using ComputerAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComputerAPI.Controllers
 {
@@ -16,7 +17,7 @@ namespace ComputerAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Osystem> Post(CreateOsDto createOsDto)
+        public async Task<ActionResult<Osystem>> Post(CreateOsDto createOsDto)
         {
             var os = new Osystem
             {
@@ -26,12 +27,30 @@ namespace ComputerAPI.Controllers
 
             if (os != null)
             {
-                computerContext.Osystems.Add(os);
-                computerContext.SaveChanges();
+                await computerContext.Osystems.AddAsync(os);
+                await computerContext.SaveChangesAsync();
                 return StatusCode(201, os);
             }
 
             return BadRequest();
+        }
+        [HttpGet]
+
+        public async Task<ActionResult<Osystem>> Get()
+        {
+            return Ok(await computerContext.Osystems.ToListAsync());
+        }
+        [HttpGet("{id}")]
+
+        public async Task<ActionResult<Osystem>> GetById(Guid id)
+        {
+            var os = computerContext.Osystems.FirstOrDefaultAsync(o => o.Id == id);
+
+            if (os != null)
+            {
+                return Ok(os);
+            }
+            return NotFound(new { message = "Nincs ilyen" });
         }
     }
 }
