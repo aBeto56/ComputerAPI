@@ -83,5 +83,18 @@ namespace ComputerAPI.Controllers
             }
             return NotFound(new { message = "Nincs ilyen." });
         }
-    } 
+        [HttpGet("getAllOsData")]
+        public async Task<ActionResult<Osystem>> GetAllOsData()
+        {
+            var allData = await computerContext.Osystems.Include(os => os.Comps).ToListAsync();
+            return Ok(allData);
+        }
+        [HttpGet("orderComputer")]
+        public async Task<ActionResult<Osystem>> GetComputer()
+        {
+            var orderOs = await computerContext.Osystems.OrderByDescending(o => o.Name).ToListAsync();
+            return Ok(orderOs);
+        }
+
+    }
 }
